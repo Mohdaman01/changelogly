@@ -84,7 +84,7 @@ export default async function DashboardPage() {
             {(projects ?? []).map((p: Project) => (
               <Link
                 key={p.id}
-                href={`/dashboard/projects/${p.id}`}
+                href={`/dashboard/projects/${p.id}/generate`}
                 className="flex items-center justify-between p-4 rounded-xl border transition-colors hover:bg-[var(--bg-subtle)]"
               >
                 <div>
@@ -126,11 +126,10 @@ export default async function DashboardPage() {
                     {formatRelative(c.created_at)}
                   </p>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                  c.status === 'published'
+                <span className={`text-xs px-2 py-1 rounded-full font-medium ${c.status === 'published'
                     ? 'bg-green-50 text-green-700'
                     : 'bg-gray-100 text-gray-600'
-                }`}>
+                  }`}>
                   {c.status}
                 </span>
               </Link>
