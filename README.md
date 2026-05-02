@@ -193,3 +193,7 @@ changelogly/
 - [ ] Post on X/Twitter #buildinpublic
 - [ ] Submit to Product Hunt
 - [ ] Post Show HN
+
+##Test Log Generation
+
+http://localhost:3000/dashboard
