@@ -58,6 +58,6 @@ export async function GET(req: NextRequest) {
   if (error) return NextResponse.json({ error: 'Invalid token' }, { status: 400 })
 
   return NextResponse.redirect(
-    new URL('/subscribed?confirmed=true', process.env.NEXT_PUBLIC_APP_URL!)
+    new URL('/subscribed?confirmed=true', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
   )
 }

@@ -11,7 +11,7 @@ const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' })
 export const metadata: Metadata = {
   title: { default: 'Changelogly', template: '%s | Changelogly' },
   description: 'Auto-generate beautiful changelogs from your GitHub commits.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL!),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   openGraph: {
     title: 'Changelogly',
     description: 'Auto-generate beautiful changelogs from your GitHub commits.',
