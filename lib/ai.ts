@@ -55,7 +55,7 @@ ${commitList}
 ${previousContext ? `\nPrevious changelog for context:\n${previousContext}` : ''}`
 
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     systemInstruction,
   })
 
@@ -100,7 +100,7 @@ export async function improveChangelogEntry(
   instruction: string
 ): Promise<string> {
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     systemInstruction:
       'You are editing a changelog entry. Apply the user instruction and return ONLY the improved markdown. No commentary.',
   })
