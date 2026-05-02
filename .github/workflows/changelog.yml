@@ -1,0 +1,33 @@
+# .github/workflows/changelog.yml
+# ─────────────────────────────────────────
+# Place this file in YOUR product's repo (not changelogly itself).
+# It auto-triggers Changelogly whenever you create a GitHub Release.
+#
+# Required: Set CHANGELOGLY_WEBHOOK_SECRET in your repo secrets.
+# This is the same secret you configure in Changelogly → Settings → Webhooks.
+
+name: Publish Changelog
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Changelogly
+        run: |
+          echo "Release ${{ github.event.release.tag_name }} published"
+          echo "Changelogly webhook will handle this automatically via GitHub webhook."
+          echo "No extra steps needed — the GitHub webhook fires on release events."
+          echo "If you disabled the webhook, you can trigger manually:"
+          curl -X POST https://changelogly.com/api/changelog/generate \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.CHANGELOGLY_API_KEY }}" \
+            -d '{
+              "projectId": "${{ vars.CHANGELOGLY_PROJECT_ID }}",
+              "toTag": "${{ github.event.release.tag_name }}",
+              "tone": "user-friendly",
+              "autoPublish": true
+            }'
