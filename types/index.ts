@@ -9,8 +9,8 @@ export interface Workspace {
   name: string
   slug: string
   plan: Plan
-  stripe_customer_id?: string
-  stripe_subscription_id?: string
+  razorpay_customer_id?: string
+  razorpay_subscription_id?: string
   github_access_token?: string
   custom_domain?: string
   logo_url?: string
@@ -137,8 +137,4 @@ export const PLAN_LIMITS: Record<Plan, {
   },
 }
 
-export const PLAN_PRICES: Record<Exclude<Plan, 'free'>, { monthly: number; priceId: string }> = {
-  starter: { monthly: 19, priceId: process.env.STRIPE_STARTER_PRICE_ID! },
-  pro:     { monthly: 49, priceId: process.env.STRIPE_PRO_PRICE_ID! },
-  team:    { monthly: 99, priceId: process.env.STRIPE_TEAM_PRICE_ID! },
-}
+

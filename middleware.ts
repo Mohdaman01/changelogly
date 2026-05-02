@@ -7,7 +7,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/changelog/subscribe',
   '/api/changelog/widget',
   '/api/webhooks/github',
-  '/api/webhooks/stripe',
+  '/api/webhooks/razorpay',
   '/widget.js',
   '/subscribed',
   '/privacy',

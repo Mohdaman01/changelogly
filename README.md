@@ -10,7 +10,7 @@ Auto-generate beautiful changelogs from your GitHub commits using AI. Publish to
 - **Email subscribers** — subscribe form + confirmation email + auto-notify on publish
 - **In-app widget** — embeddable "What's new" popup (Pro+)
 - **Auto-publish** — GitHub release webhook triggers generation + publish (Starter+)
-- **Stripe billing** — Free / Starter ($19) / Pro ($49) / Team ($99)
+- **Razorpay billing** — Free / Starter (₹19) / Pro (₹49) / Team (₹99)
 
 ## ✦ Tech stack
 
@@ -19,8 +19,8 @@ Auto-generate beautiful changelogs from your GitHub commits using AI. Publish to
 | Framework | Next.js 14 (App Router) |
 | Auth | Clerk (GitHub OAuth) |
 | Database | Supabase (Postgres + RLS) |
-| AI | OpenAI gpt-4o-mini |
-| Payments | Stripe Subscriptions |
+| AI | Google Gemini 1.5 Flash |
+| Payments | Razorpay Subscriptions |
 | Email | Resend |
 | Deploy | Vercel |
 
@@ -66,27 +66,29 @@ Fill in all values — see `.env.local.example` for instructions.
    - Callback URL: `http://localhost:3000/api/auth/github/callback`
 3. Copy Client ID + Secret to `.env.local`
 
-### 6. OpenAI
+### 6. Google Gemini
 
-1. Get API key from [platform.openai.com](https://platform.openai.com)
-2. Add to `.env.local`
+1. Get API key from [aistudio.google.com](https://aistudio.google.com/app/apikey)
+2. Add `GEMINI_API_KEY` to `.env.local`
 
-### 7. Stripe
+### 7. Razorpay
 
-1. Create account at [stripe.com](https://stripe.com)
-2. Create 3 products in Stripe dashboard:
-   - Starter — $19/month recurring
-   - Pro — $49/month recurring
-   - Team — $99/month recurring
-3. Copy each Price ID to `.env.local`
-4. Set up webhook:
-   - Endpoint: `https://yourdomain.com/api/webhooks/stripe`
-   - Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
-5. Copy webhook secret to `.env.local`
+1. Create account at [dashboard.razorpay.com](https://dashboard.razorpay.com)
+2. Go to **Subscriptions → Plans** and create 3 plans:
+   - Starter — ₹19/month recurring
+   - Pro — ₹49/month recurring
+   - Team — ₹99/month recurring
+3. Copy each Plan ID (`plan_xxxx`) to `.env.local`
+4. Go to **Settings → API Keys** → generate key pair → copy to `.env.local`
+5. Set up webhook:
+   - Go to **Settings → Webhooks → Add New Webhook**
+   - Endpoint: `https://yourdomain.com/api/webhooks/razorpay`
+   - Events: `subscription.charged`, `subscription.cancelled`, `subscription.halted`, `payment.failed`
+   - Copy the **webhook secret** to `RAZORPAY_WEBHOOK_SECRET` in `.env.local`
 
-For local testing:
+For local testing, use the [Razorpay webhook simulator](https://dashboard.razorpay.com/app/webhooks) or expose localhost via:
 ```bash
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
+npx localtunnel --port 3000
 ```
 
 ### 8. Resend (Email)
@@ -122,8 +124,8 @@ changelogly/
 │   │   ├── changelog/            # Generate, publish, subscribe, widget
 │   │   ├── github/repos/         # Repo + tag fetching
 │   │   ├── projects/             # Project CRUD
-│   │   ├── stripe/               # Checkout + billing portal
-│   │   ├── webhooks/             # Stripe + GitHub webhooks
+│   │   ├── razorpay/             # Checkout + subscription portal
+│   │   ├── webhooks/             # Razorpay + GitHub webhooks
 │   │   └── workspace/            # Workspace CRUD
 │   ├── changelog/[workspace]/    # Public changelog pages
 │   ├── dashboard/                # App dashboard
@@ -133,10 +135,10 @@ changelogly/
 │   ├── login/                    # Clerk sign-in
 │   └── onboarding/               # New user setup
 ├── lib/
-│   ├── ai.ts                     # OpenAI changelog generation
+│   ├── ai.ts                     # Gemini changelog generation
 │   ├── github.ts                 # GitHub API (Octokit)
 │   ├── email.ts                  # Resend email service
-│   ├── stripe.ts                 # Stripe helpers
+│   ├── razorpay.ts               # Razorpay helpers
 │   ├── supabase.ts               # Supabase clients
 │   └── utils.ts                  # Shared utilities
 ├── types/
@@ -153,7 +155,7 @@ changelogly/
 ### User generates a changelog
 1. Dashboard → Project → Generate
 2. Picks tag range + tone
-3. POST `/api/changelog/generate` → fetches GitHub commits → calls OpenAI → saves as draft
+3. POST `/api/changelog/generate` → fetches GitHub commits → calls Gemini → saves as draft
 4. User edits in markdown editor
 5. Clicks Publish → POST `/api/changelog/[id]/publish` → emails subscribers
 
@@ -178,14 +180,14 @@ changelogly/
 | Pro | $49/mo | 10 | Unlimited | Widget, remove branding |
 | Team | $99/mo | Unlimited | Unlimited | API, unlimited team |
 
-**AI cost per generation:** ~$0.002 (gpt-4o-mini at 1,500 tokens)
-**Gross margin at $49/mo Pro:** ~97%
+**AI cost per generation:** ~$0.00007 (Gemini 1.5 Flash at 1,500 tokens)
+**Gross margin at ₹49/mo Pro:** ~99%
 
 ## ✦ Launch checklist
 
 - [ ] Deploy to Vercel
 - [ ] Set up custom domain
-- [ ] Configure Stripe webhook with production URL
+- [ ] Configure Razorpay webhook with production URL
 - [ ] Add GitHub OAuth production callback URL
 - [ ] Test end-to-end: sign up → create project → generate → publish → receive email
 - [ ] Post on X/Twitter #buildinpublic

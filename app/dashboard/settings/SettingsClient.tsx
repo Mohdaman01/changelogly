@@ -37,22 +37,47 @@ export default function SettingsClient({ workspace }: { workspace: Workspace }) 
 
   const handleUpgrade = async (plan: string) => {
     setUpgrading(plan)
-    const res = await fetch('/api/stripe/checkout', {
+    const res = await fetch('/api/razorpay/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ plan }),
     })
-    const { url, error } = await res.json()
-    if (url) window.location.href = url
-    else { toast.error(error ?? 'Something went wrong'); setUpgrading(null) }
+    const data = await res.json()
+    if (!res.ok) { toast.error(data.error ?? 'Something went wrong'); setUpgrading(null); return }
+
+    // Load Razorpay checkout.js and open the modal
+    const script = document.createElement('script')
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.onload = () => {
+      const rzp = new (window as any).Razorpay({
+        key: data.keyId,
+        subscription_id: data.subscriptionId,
+        name: data.name,
+        description: data.description,
+        prefill: data.prefill,
+        theme: data.theme,
+        handler: () => {
+          toast.success('Payment successful! Your plan will be updated shortly.')
+          window.location.href = '/dashboard/settings?success=upgraded'
+        },
+      })
+      rzp.open()
+      setUpgrading(null)
+    }
+    document.body.appendChild(script)
   }
 
   const handlePortal = async () => {
     setPortaling(true)
-    const res = await fetch('/api/stripe/portal', { method: 'POST' })
-    const { url, error } = await res.json()
-    if (url) window.location.href = url
-    else { toast.error(error ?? 'Something went wrong'); setPortaling(false) }
+    const res = await fetch('/api/razorpay/portal', { method: 'POST' })
+    const data = await res.json()
+    if (data.cancelled) {
+      toast.success('Subscription cancelled. You\'ve been moved to the Free plan.')
+      window.location.reload()
+    } else {
+      toast.error(data.error ?? 'Something went wrong')
+    }
+    setPortaling(false)
   }
 
   return (
@@ -241,13 +266,14 @@ export default function SettingsClient({ workspace }: { workspace: Workspace }) 
           ))}
         </div>
 
-        {workspace.stripe_customer_id && (
+        {workspace.razorpay_customer_id && (
           <button
             onClick={handlePortal}
             disabled={portaling}
             className="text-sm px-4 py-2 rounded-lg border transition-colors hover:bg-[var(--bg-subtle)] disabled:opacity-50"
+            style={{ color: '#dc2626', borderColor: '#fecaca' }}
           >
-            {portaling ? 'Opening…' : 'Manage subscription & invoices →'}
+            {portaling ? 'Cancelling…' : 'Cancel subscription →'}
           </button>
         )}
       </section>

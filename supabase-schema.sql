@@ -13,8 +13,8 @@ create table workspaces (
   name        text not null,
   slug        text unique not null,           -- used for subdomain: slug.changelogly.com
   plan        text not null default 'free',   -- free | starter | pro | team
-  stripe_customer_id    text,
-  stripe_subscription_id text,
+  razorpay_customer_id    text,
+  razorpay_subscription_id text,
   github_access_token   text,                 -- encrypted GitHub OAuth token
   custom_domain text,
   logo_url    text,
