@@ -93,7 +93,7 @@ function buildChangelogEmail({
     <div style="padding:16px 32px;border-top:1px solid #f3f4f6;font-size:12px;color:#9ca3af">
       You're receiving this because you subscribed to ${project.name} changelog updates.
       <br>
-      ${workspace.show_branding !== false ? `Powered by <a href="${APP_URL}" style="color:#6366f1">Changelogly</a>` : ''}
+      ${project.show_branding !== false ? `Powered by <a href="${APP_URL}" style="color:#6366f1">Changelogly</a>` : ''}
     </div>
   </div>
 </body>

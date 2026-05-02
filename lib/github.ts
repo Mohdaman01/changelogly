@@ -5,6 +5,16 @@ export function getOctokit(accessToken: string) {
   return new Octokit({ auth: accessToken })
 }
 
+/**
+ * Parse a GitHub "owner/repo" full name into its parts.
+ * Returns null if the format is invalid.
+ */
+export function parseGitHubRepo(fullName: string): { owner: string; repo: string } | null {
+  const parts = fullName.split('/')
+  if (parts.length !== 2 || !parts[0] || !parts[1]) return null
+  return { owner: parts[0], repo: parts[1] }
+}
+
 export function getGitHubOAuthUrl(state: string): string {
   const params = new URLSearchParams({
     client_id: process.env.GITHUB_CLIENT_ID!,
