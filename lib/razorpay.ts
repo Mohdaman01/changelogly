@@ -13,8 +13,8 @@ export const razorpay = new Razorpay({
  */
 export const PLAN_PRICES: Record<Exclude<Plan, 'free'>, { monthly: number; planId: string }> = {
   starter: { monthly: 19, planId: process.env.RAZORPAY_STARTER_PLAN_ID! },
-  pro:     { monthly: 49, planId: process.env.RAZORPAY_PRO_PLAN_ID! },
-  team:    { monthly: 99, planId: process.env.RAZORPAY_TEAM_PLAN_ID! },
+  pro: { monthly: 49, planId: process.env.RAZORPAY_PRO_PLAN_ID! },
+  team: { monthly: 99, planId: process.env.RAZORPAY_TEAM_PLAN_ID! },
 }
 
 /**
