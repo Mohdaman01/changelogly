@@ -62,7 +62,7 @@ ${previousContext ? `\nPrevious changelog for context:\n${previousContext}` : ''
   const result = await model.generateContent({
     contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
     generationConfig: {
-      maxOutputTokens: 1500,
+      maxOutputTokens: 8192,
       temperature: 0.4,
     },
   })
@@ -112,7 +112,7 @@ export async function improveChangelogEntry(
         parts: [{ text: `Original:\n${entry}\n\nInstruction: ${instruction}` }],
       },
     ],
-    generationConfig: { maxOutputTokens: 800 },
+    generationConfig: { maxOutputTokens: 4096 },
   })
 
   return result.response.text() ?? entry
