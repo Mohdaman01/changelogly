@@ -43,13 +43,29 @@ export default function GenerateChangelogPage() {
   }
 
   const handleGenerate = async () => {
-    if (!fromTag && !toTag) return toast.error('Select at least one tag or date range')
+    // Only require selecting a tag if the repository actually has tags
+    if (tags.length > 0 && !fromTag && !toTag) {
+      return toast.error('Select at least one tag or date range')
+    }
     setLoading(true)
+
+    let payloadSince = undefined
+    if (tags.length === 0) {
+      const d = new Date()
+      d.setDate(d.getDate() - 30)
+      payloadSince = d.toISOString()
+    }
 
     const res = await fetch('/api/changelog/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ projectId, tone, fromTag, toTag }),
+      body: JSON.stringify({ 
+        projectId, 
+        tone, 
+        fromTag: fromTag || undefined, 
+        toTag: toTag || undefined,
+        since: payloadSince 
+      }),
     })
 
     const data = await res.json()
