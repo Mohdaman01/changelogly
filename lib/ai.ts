@@ -31,22 +31,32 @@ export async function generateChangelog({
   previousContext?: string
 }): Promise<{ title: string; content: string; tags: string[]; tokensUsed: number }> {
   const commitList = commits
-    .slice(0, 100) // cap at 100 commits
-    .map((c) => `- [${c.sha.slice(0, 7)}] ${c.message} (${c.author})`)
+    .filter((c) => {
+      const msg = c.message.toLowerCase()
+      // Skip meaningless 1-word commits or common internal chores
+      if (msg.length < 8) return false
+      if (msg.includes('wip') || msg.includes('chore:') || msg.includes('merge') || msg.includes('bump')) return false
+      return true
+    })
+    .slice(0, 50) // cap at 50 most meaningful commits to save input tokens
+    .map((c) => `- ${c.message}`) // Removed hash/author to save tokens
     .join('\n')
 
   const systemInstruction = `You are a changelog writer for ${projectName}. 
 ${TONE_INSTRUCTIONS[tone]}
 
-Rules:
-- Output ONLY valid Markdown
-- Start with a short title line (no #, just plain text) on the FIRST line
-- Then a blank line
-- Then the full changelog body using ## headings for groups
-- Add relevant emoji to section headers (e.g. ## ✨ New Features)
-- End with a JSON block on the last line: {"tags":["tag1","tag2"]} — max 5 tags
-- If a commit message is meaningless (e.g. "fix", "wip", "update"), skip it
-- Never mention internal tooling, CI, or dependency bumps in user-friendly/marketing tone`
+CRITICAL RULES:
+- Output ONLY valid Markdown.
+- No introductory or concluding remarks.
+- Follow this EXACT format:
+
+[Title line, plain text]
+Tags: ["tag1", "tag2"]
+
+## [Emoji] [Group Name]
+- [Content]
+
+- Never mention internal tooling, CI, or dependency bumps in user-friendly/marketing tone.`
 
   const userPrompt = `Generate a changelog for ${projectName}${version ? ` ${version}` : ''}.
 
@@ -55,7 +65,7 @@ ${commitList}
 ${previousContext ? `\nPrevious changelog for context:\n${previousContext}` : ''}`
 
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.0-flash-lite',
     systemInstruction,
   })
 
@@ -73,19 +83,20 @@ ${previousContext ? `\nPrevious changelog for context:\n${previousContext}` : ''
   // Extract title (first line)
   const title = lines[0].replace(/^#+\s*/, '').trim() || `${projectName} ${version ?? 'Update'}`
 
-  // Extract tags JSON from last line
+  // Extract tags (second line)
   let tags: string[] = []
-  const lastLine = lines[lines.length - 1]
-  if (lastLine.startsWith('{')) {
+  if (lines.length > 1 && lines[1].toLowerCase().startsWith('tags:')) {
     try {
-      const parsed = JSON.parse(lastLine)
-      tags = parsed.tags ?? []
-      lines.pop()
+      const tagsStr = lines[1].substring(lines[1].indexOf('[')).trim()
+      tags = JSON.parse(tagsStr)
     } catch {}
   }
 
-  // Content is everything after first line
-  const content = lines.slice(2).join('\n').trim()
+  // Content is everything from the first ## heading onwards
+  const contentStartIdx = lines.findIndex((l, i) => i > 1 && l.startsWith('##'))
+  const content = contentStartIdx !== -1 
+    ? lines.slice(contentStartIdx).join('\n').trim() 
+    : lines.slice(2).join('\n').trim()
 
   return {
     title,
@@ -100,7 +111,7 @@ export async function improveChangelogEntry(
   instruction: string
 ): Promise<string> {
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.0-flash-lite',
     systemInstruction:
       'You are editing a changelog entry. Apply the user instruction and return ONLY the improved markdown. No commentary.',
   })
