@@ -2,7 +2,7 @@ import { auth } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getCommitsBetween, getTags, parseGitHubRepo } from '@/lib/github'
-import { generateChangelog } from '@/lib/ai'
+import { generateChangelogGroq } from '@/lib/ai-groq'
 import type { ChangelogTone, Plan } from '@/types'
 
 export async function POST(req: NextRequest) {
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Generate with AI
-  const { title, content, tags, tokensUsed } = await generateChangelog({
+  const { title, content, tags, tokensUsed } = await generateChangelogGroq({
     commits,
     version: toTag,
     projectName: project.name,

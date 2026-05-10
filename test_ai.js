@@ -1,7 +1,7 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 async function main() {
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const genAI = new GoogleGenerativeAI("AIzaSyAf5NG0ZLxwoF_vFpImCeYDsCM-0bc8qPs");
   const systemInstruction = `You are a changelog writer for TestProject. 
 Write for software engineers. Use precise technical language. 
     Include function/API names where relevant. Group by: Breaking Changes, 
@@ -25,7 +25,7 @@ Commits:
 - [3456789] Upgraded the Gemini model from 1.5-flash to 2.5-flash (Bob)`;
 
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.0-flash',
     systemInstruction,
   });
 
@@ -40,7 +40,7 @@ Commits:
   const raw = result.response.text();
   console.log("--- RAW ---");
   console.log(raw);
-  
+
   const lines = raw.trim().split('\n');
   const title = lines[0].replace(/^#+\s*/, '').trim() || `TestProject Update`;
   let tags = [];
@@ -50,7 +50,7 @@ Commits:
       const parsed = JSON.parse(lastLine);
       tags = parsed.tags ?? [];
       lines.pop();
-    } catch (e) {}
+    } catch (e) { }
   }
   const content = lines.slice(2).join('\n').trim();
   console.log("--- TITLE ---");

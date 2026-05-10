@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getCommitsBetween, getLatestRelease, parseGitHubRepo } from '@/lib/github'
-import { generateChangelog } from '@/lib/ai'
+import { generateChangelogGroq } from '@/lib/ai-groq'
 import { sendChangelogNotification } from '@/lib/email'
 import crypto from 'crypto'
 
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
   if (!commits.length) return NextResponse.json({ ok: true })
 
   // Generate changelog
-  const { title, content, tags, tokensUsed } = await generateChangelog({
+  const { title, content, tags, tokensUsed } = await generateChangelogGroq({
     commits,
     version: tag,
     projectName: project.name,
