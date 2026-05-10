@@ -1,59 +1,104 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* ─── Tailwind CSS v4 ────────────────────────────────────────────────────── */
+@import "tailwindcss";
 
-@layer base {
-  :root {
-    --bg: #ffffff;
-    --bg-subtle: #f9fafb;
-    --bg-muted: #f3f4f6;
-    --border: #e5e7eb;
-    --border-strong: #d1d5db;
-    --text: #111827;
-    --text-muted: #6b7280;
-    --text-subtle: #9ca3af;
-    --accent: #6366f1;
-    --accent-hover: #4f46e5;
-    --accent-subtle: #eef2ff;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --danger: #ef4444;
-    --toast-bg: #fff;
-    --toast-fg: #111;
-    --toast-border: #e5e7eb;
-  }
+/* Tell v4 to also load the tailwind.config.js (v3-compat) for custom colors, 
+   keyframes, and font-family extensions */
+@config "../tailwind.config.js";
 
-  .dark {
-    --bg: #0f1117;
-    --bg-subtle: #161b22;
-    --bg-muted: #1c2128;
-    --border: #30363d;
-    --border-strong: #484f58;
-    --text: #e6edf3;
-    --text-muted: #848d97;
-    --text-subtle: #6e7681;
-    --accent: #818cf8;
-    --accent-hover: #6366f1;
-    --accent-subtle: #1e2040;
-    --toast-bg: #161b22;
-    --toast-fg: #e6edf3;
-    --toast-border: #30363d;
-  }
+/* ─── Design tokens ─────────────────────────────────────────────────────── */
+/* Tailwind v4 @theme: generates bg-accent, text-accent, border-border, etc. */
+@theme {
+  --color-accent:        #6366f1;
+  --color-accent-hover:  #4f46e5;
+  --color-accent-subtle: #eef2ff;
+  --color-border:        #e5e7eb;
+  --color-success:       #10b981;
+  --color-warning:       #f59e0b;
+  --color-danger:        #ef4444;
+
+  --font-family-sans: var(--font-inter), system-ui, sans-serif;
+  --font-family-mono: var(--font-mono), monospace;
+
+  --animate-fade-in:       fade-in 0.4s ease forwards;
+  --animate-fade-in-scale: fade-in-scale 0.3s ease forwards;
 }
 
-@layer base {
-  * { border-color: var(--border); }
-  body {
-    background: var(--bg);
-    color: var(--text);
-  }
+/* ─── Dark-mode overrides for @theme colors ─────────────────────────────── */
+.dark {
+  --color-accent:        #818cf8;
+  --color-accent-hover:  #6366f1;
+  --color-accent-subtle: #1e2040;
+  --color-border:        #30363d;
 }
 
-@layer utilities {
-  .text-balance { text-wrap: balance; }
+/* ─── CSS custom properties (used via inline style / var()) ─────────────── */
+:root {
+  --bg:           #ffffff;
+  --bg-subtle:    #f9fafb;
+  --bg-muted:     #f3f4f6;
+  --border:       #e5e7eb;
+  --border-strong:#d1d5db;
+  --text:         #111827;
+  --text-muted:   #6b7280;
+  --text-subtle:  #9ca3af;
+  --accent:       #6366f1;
+  --accent-hover: #4f46e5;
+  --accent-subtle:#eef2ff;
+  --success:      #10b981;
+  --warning:      #f59e0b;
+  --danger:       #ef4444;
+  --toast-bg:     #fff;
+  --toast-fg:     #111;
+  --toast-border: #e5e7eb;
 }
 
-/* Changelog markdown styles */
+.dark {
+  --bg:           #0f1117;
+  --bg-subtle:    #161b22;
+  --bg-muted:     #1c2128;
+  --border:       #30363d;
+  --border-strong:#484f58;
+  --text:         #e6edf3;
+  --text-muted:   #848d97;
+  --text-subtle:  #6e7681;
+  --accent:       #818cf8;
+  --accent-hover: #6366f1;
+  --accent-subtle:#1e2040;
+  --toast-bg:     #161b22;
+  --toast-fg:     #e6edf3;
+  --toast-border: #30363d;
+}
+
+/* ─── Base resets ───────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Keyframes ─────────────────────────────────────────────────────────── */
+@keyframes fade-in {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-scale {
+  0%   { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ─── Utilities ─────────────────────────────────────────────────────────── */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* ─── Changelog markdown styles ─────────────────────────────────────────── */
 .changelog-content h2 {
   @apply text-lg font-semibold mt-8 mb-3 first:mt-0;
 }
