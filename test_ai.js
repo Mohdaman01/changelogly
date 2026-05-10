@@ -1,7 +1,7 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 async function main() {
-  const genAI = new GoogleGenerativeAI("AIzaSyAf5NG0ZLxwoF_vFpImCeYDsCM-0bc8qPs");
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   const systemInstruction = `You are a changelog writer for TestProject. 
 Write for software engineers. Use precise technical language. 
     Include function/API names where relevant. Group by: Breaking Changes, 
