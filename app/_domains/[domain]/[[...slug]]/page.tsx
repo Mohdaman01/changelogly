@@ -4,49 +4,58 @@ import PublicChangelogView from '@/components/PublicChangelogView'
 import type { Metadata } from 'next'
 
 interface Props {
-  params: Promise<{ workspace: string; project: string }>
+  params: Promise<{ domain: string; slug?: string[] }>
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
-  const { data: project } = await supabaseAdmin
-    .from('projects')
-    .select('name, description, workspaces(name)')
-    .eq('slug', params.project)
-    .eq('is_public', true)
+  const domain = decodeURIComponent(params.domain)
+  
+  const { data: workspace } = await supabaseAdmin
+    .from('workspaces')
+    .select('name')
+    .eq('custom_domain', domain)
     .single()
 
-  if (!project) return { title: 'Changelog' }
+  if (!workspace) return { title: 'Changelog' }
   return {
-    title: `${project.name} Changelog`,
-    description: project.description ?? `Latest updates from ${project.name}`,
+    title: `${workspace.name} Changelog`,
   }
 }
 
-export default async function PublicChangelogPage(props: Props) {
+export default async function DomainPage(props: Props) {
   const params = await props.params
-  
-  // Fetch workspace
+  const domain = decodeURIComponent(params.domain)
+  const pathSlug = params.slug?.[0] // e.g. custom.com/my-project -> slug is ['my-project']
+
+  // 1. Find workspace by custom domain
   const { data: workspace } = await supabaseAdmin
     .from('workspaces')
     .select('*')
-    .eq('slug', params.workspace)
+    .eq('custom_domain', domain)
     .single()
 
   if (!workspace) notFound()
 
-  // Fetch project
-  const { data: project } = await supabaseAdmin
+  // 2. Find project
+  let projectQuery = supabaseAdmin
     .from('projects')
     .select('*')
     .eq('workspace_id', workspace.id)
-    .eq('slug', params.project)
     .eq('is_public', true)
-    .single()
+
+  if (pathSlug) {
+    projectQuery = projectQuery.eq('slug', pathSlug)
+  } else {
+    // If no slug, just get the first project
+    projectQuery = projectQuery.order('created_at', { ascending: true }).limit(1)
+  }
+
+  const { data: project } = await projectQuery.single()
 
   if (!project) notFound()
 
-  // Fetch published changelogs
+  // 3. Fetch published changelogs
   const { data: changelogs } = await supabaseAdmin
     .from('changelogs')
     .select('*')

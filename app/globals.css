@@ -126,3 +126,102 @@ body {
 .changelog-content p {
   @apply mb-4 leading-relaxed;
 }
+
+/* ─── Extended Markdown styles ──────────────────────────────────────────── */
+.changelog-content h1 {
+  @apply text-2xl font-bold mt-10 mb-4 first:mt-0;
+}
+.changelog-content h4,
+.changelog-content h5,
+.changelog-content h6 {
+  @apply text-sm font-semibold mt-4 mb-2;
+}
+.changelog-content ol {
+  @apply list-decimal space-y-1.5 mb-6 pl-5;
+}
+.changelog-content ol li {
+  @apply text-[15px] leading-relaxed;
+}
+.changelog-content pre {
+  @apply bg-[var(--bg-muted)] border border-[var(--border)] rounded-lg p-4 mb-6 overflow-x-auto;
+}
+.changelog-content pre code {
+  @apply text-[13px] font-mono bg-transparent border-0 p-0 block text-[var(--text)];
+}
+.changelog-content blockquote {
+  @apply border-l-4 border-[var(--accent)] bg-[var(--accent-subtle)] px-4 py-3 my-4 rounded-r-lg text-[var(--text-muted)] italic;
+}
+.changelog-content blockquote p {
+  @apply mb-0;
+}
+.changelog-content table {
+  @apply w-full border-collapse border border-[var(--border)] mb-6;
+}
+.changelog-content table th {
+  @apply bg-[var(--bg-subtle)] border border-[var(--border)] px-4 py-2 text-left font-semibold;
+}
+.changelog-content table td {
+  @apply border border-[var(--border)] px-4 py-2;
+}
+.changelog-content table tbody tr:nth-child(odd) {
+  @apply bg-[var(--bg-muted)];
+}
+.changelog-content table tbody tr:hover {
+  @apply bg-[var(--accent-subtle)];
+}
+.changelog-content em {
+  @apply italic;
+}
+.changelog-content hr {
+  @apply border-0 border-t-2 border-[var(--border)] my-6;
+}
+.changelog-content img {
+  @apply max-w-full h-auto rounded-lg border border-[var(--border)] my-4;
+}
+
+/* ─── Split-pane editor preview styles ──────────────────────────────────── */
+.changelog-preview h1,
+.changelog-preview h2,
+.changelog-preview h3,
+.changelog-preview h4,
+.changelog-preview h5,
+.changelog-preview h6 {
+  @apply font-semibold mt-6 mb-3 scroll-mt-8;
+}
+.changelog-preview h1 { @apply text-2xl; }
+.changelog-preview h2 { @apply text-xl; }
+.changelog-preview h3 { @apply text-lg; }
+.changelog-preview h4 { @apply text-base; }
+
+.changelog-preview ul,
+.changelog-preview ol {
+  @apply mb-4 ml-5;
+}
+.changelog-preview li {
+  @apply mb-1;
+}
+.changelog-preview p {
+  @apply mb-3 leading-relaxed;
+}
+.changelog-preview code {
+  @apply bg-[var(--bg-muted)] px-1.5 py-0.5 rounded text-[13px] font-mono;
+}
+.changelog-preview pre {
+  @apply bg-[var(--bg-muted)] border border-[var(--border)] rounded p-4 mb-4 overflow-x-auto;
+}
+.changelog-preview pre code {
+  @apply bg-transparent px-0 py-0;
+}
+.changelog-preview blockquote {
+  @apply border-l-4 border-[var(--accent)] px-4 py-2 italic text-[var(--text-muted)] my-3;
+}
+.changelog-preview table {
+  @apply w-full border-collapse border border-[var(--border)] mb-4;
+}
+.changelog-preview th,
+.changelog-preview td {
+  @apply border border-[var(--border)] px-3 py-2;
+}
+.changelog-preview th {
+  @apply bg-[var(--bg-muted)] font-semibold;
+}

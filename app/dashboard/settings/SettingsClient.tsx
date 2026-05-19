@@ -16,6 +16,7 @@ export default function SettingsClient({ workspace }: { workspace: Workspace }) 
   const params = useSearchParams()
   const [name, setName] = useState(workspace.name)
   const [brandColor, setBrandColor] = useState(workspace.brand_color ?? '#6366f1')
+  const [customDomain, setCustomDomain] = useState(workspace.custom_domain ?? '')
   const [saving, setSaving] = useState(false)
   const [upgrading, setUpgrading] = useState<string | null>(null)
   const [portaling, setPortaling] = useState(false)
@@ -28,7 +29,11 @@ export default function SettingsClient({ workspace }: { workspace: Workspace }) 
     const res = await fetch('/api/workspace', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, brand_color: brandColor }),
+      body: JSON.stringify({
+        name,
+        brand_color: brandColor,
+        custom_domain: customDomain.toLowerCase().trim() || null
+      }),
     })
     if (res.ok) toast.success('Settings saved')
     else toast.error('Failed to save')
@@ -159,7 +164,55 @@ export default function SettingsClient({ workspace }: { workspace: Workspace }) 
         </div>
       </section>
 
-      {/* GitHub integration */}
+      {/* Custom Domain */}
+      <section className="rounded-2xl border p-6" style={{ background: 'var(--bg)' }}>
+        <div className="flex items-start justify-between mb-1">
+          <h2 className="font-semibold">Custom Domain</h2>
+          {workspace.plan === 'free' && (
+            <span className="text-xs px-2 py-1 rounded-full font-medium" style={{ background: 'var(--accent-subtle)', color: 'var(--accent)' }}>Starter+</span>
+          )}
+        </div>
+        <p className="text-sm mb-5" style={{ color: 'var(--text-muted)' }}>
+          Serve your changelog from your own domain (e.g. <code>changelog.yourcompany.com</code>).
+        </p>
+        
+        {workspace.plan !== 'free' ? (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Domain name</label>
+              <input
+                type="text"
+                placeholder="changelog.example.com"
+                value={customDomain}
+                onChange={(e) => setCustomDomain(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg border text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
+              />
+            </div>
+            {customDomain && (
+              <div className="rounded-xl p-4 text-xs space-y-2" style={{ background: 'var(--bg-muted)', border: '1px solid var(--border)' }}>
+                <p className="font-semibold" style={{ color: 'var(--text)' }}>DNS Setup Instructions:</p>
+                <p style={{ color: 'var(--text-muted)' }}>
+                  Create a <strong>CNAME</strong> record pointing <strong>{customDomain}</strong> to <strong>cname.changelogly.com</strong>
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-dashed p-6 text-center">
+            <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>Upgrade to Starter to use a custom domain</p>
+            <button
+              onClick={() => handleUpgrade('starter')}
+              className="text-sm px-4 py-2 rounded-lg font-medium text-white"
+              style={{ background: 'var(--accent)' }}
+            >
+              Upgrade to Starter →
+            </button>
+          </div>
+        )}
+      </section>
+
+       {/* GitHub integration */}
       <section className="rounded-2xl border p-6" style={{ background: 'var(--bg)' }}>
         <h2 className="font-semibold mb-1">GitHub integration</h2>
         <p className="text-sm mb-5" style={{ color: 'var(--text-muted)' }}>Connect GitHub to auto-fetch commits and set up release webhooks.</p>

@@ -33,6 +33,9 @@ create table projects (
   slug          text not null,                -- project slug for URL
   is_public     boolean default true,
   show_branding boolean default true,         -- hide on pro+
+  github_webhook_secret text,                 -- encrypted webhook secret
+  github_webhook_id text,                     -- GitHub's webhook ID
+  webhook_tone_preference text default 'user-friendly',  -- technical | marketing | user-friendly
   created_at    timestamptz default now(),
   unique(workspace_id, slug)
 );
@@ -90,6 +93,18 @@ create table generation_usage (
   created_at    timestamptz default now()
 );
 
+-- ─── webhook_logs ───────────────────────────────────────────
+create table webhook_logs (
+  id            uuid primary key default uuid_generate_v4(),
+  project_id    uuid references projects(id) on delete cascade,
+  event_type    text not null,                -- 'release', 'error', 'validation_failed'
+  payload       jsonb,                        -- full webhook payload or error details
+  status        text not null,                -- 'success', 'failed', 'invalid_signature', 'invalid_event'
+  error_message text,                        -- human-readable error
+  changelog_id  uuid references changelogs(id) on delete set null,  -- if changelog was created
+  created_at    timestamptz default now()
+);
+
 -- ─── Row Level Security ─────────────────────────────────────
 alter table workspaces enable row level security;
 alter table projects enable row level security;
@@ -97,6 +112,7 @@ alter table changelogs enable row level security;
 alter table changelog_subscribers enable row level security;
 alter table team_members enable row level security;
 alter table generation_usage enable row level security;
+alter table webhook_logs enable row level security;
 
 -- Service role bypasses RLS (used by API routes with service key)
 -- Client-side queries use anon key + these policies
@@ -125,6 +141,16 @@ create policy "changelog workspace access"
     )
   );
 
+create policy "webhook logs workspace access"
+  on webhook_logs for select
+  using (
+    project_id in (
+      select id from projects where workspace_id in (
+        select id from workspaces where clerk_user_id = auth.jwt() ->> 'sub'
+      )
+    )
+  );
+
 -- ─── Indexes ────────────────────────────────────────────────
 create index on projects(workspace_id);
 create index on changelogs(project_id);
@@ -132,3 +158,6 @@ create index on changelogs(workspace_id);
 create index on changelogs(status, published_at desc);
 create index on changelog_subscribers(project_id);
 create index on generation_usage(workspace_id, created_at desc);
+create index on webhook_logs(project_id);
+create index on webhook_logs(project_id, created_at desc);
+create index on webhook_logs(status);

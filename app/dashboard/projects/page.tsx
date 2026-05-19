@@ -86,7 +86,14 @@ export default async function ProjectsPage() {
                   <span className="text-xs" style={{ color: 'var(--text-subtle)' }}>
                     {changelogCount} changelog{changelogCount !== 1 ? 's' : ''}
                   </span>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/dashboard/projects/${p.id}/settings`}
+                      className="text-xs px-2 py-1.5 rounded-lg font-medium"
+                      style={{ background: 'var(--bg-subtle)', color: 'var(--accent)' }}
+                    >
+                      ⚙ Settings
+                    </Link>
                     <Link
                       href={`/changelog/${workspace.slug}/${p.slug}`}
                       target="_blank"
