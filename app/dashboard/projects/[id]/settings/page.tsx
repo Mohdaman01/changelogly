@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { supabaseAdmin } from '@/lib/supabase'
 import WebhookManager from '@/components/WebhookManager'
+import ProjectSettingsClient from '../ProjectSettingsClient'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -33,31 +34,5 @@ export default async function ProjectSettingsPage(props: Props) {
 
   if (!project) redirect('/dashboard/projects')
 
-  return (
-    <div className="p-8 max-w-2xl space-y-8">
-      <div>
-        <button
-          onClick={() => history.back()}
-          className="text-sm mb-4 flex items-center gap-1 hover:opacity-75 transition-opacity"
-          style={{ color: 'var(--text-muted)' }}
-        >
-          ← Back
-        </button>
-        <h1 className="text-2xl font-bold" style={{ letterSpacing: '-0.02em' }}>
-          {project.name} — Settings
-        </h1>
-      </div>
-
-      {/* Webhook Configuration */}
-      <section className="rounded-2xl border p-6" style={{ background: 'var(--bg)' }}>
-        <WebhookManager
-          projectId={projectId}
-          projectName={project.name}
-          currentTone={project.webhook_tone_preference}
-          isWebhookRegistered={!!project.github_webhook_secret}
-          plan={workspace.plan}
-        />
-      </section>
-    </div>
-  )
+  return <ProjectSettingsClient project={project} workspace={workspace} />
 }
